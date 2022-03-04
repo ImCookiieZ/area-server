@@ -4,10 +4,9 @@ import { add_tokens, get_id_by_name, update_tokens, get_refresh_token } from '..
 import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
-
-export const client_id = 'k5ndHm7BU7tnwYMQYp1gCg';
-export const client_secret = "K7wrHIqazLhnoBj3KIv5DmF49DQhkg"
-const redirect_uri = 'http://127.0.0.1:8080/reddit/callback';
+export const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'reddit'`)).rows[0].client_id;
+export const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'reddit'`)).rows[0].client_secret;
+const redirect_uri = 'https://karl-area-server.herokuapp.com/reddit/callback';
 
 export const unsubscribe = async (req, res) => {
     var user_id = req.user.userid
@@ -30,7 +29,7 @@ export const login = async (req, res) => {
             response_type: 'code',
             client_id: 'k5ndHm7BU7tnwYMQYp1gCg',
             scope: scope,
-            redirect_uri: 'http://127.0.0.1:8080/reddit/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/reddit/callback',
             state: state,
             duration: "permanent"
         }))
@@ -49,7 +48,7 @@ export const loginApp = async (req, res) => {
             response_type: 'code',
             client_id: 'k5ndHm7BU7tnwYMQYp1gCg',
             scope: scope,
-            redirect_uri: 'http://127.0.0.1:8080/reddit/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/reddit/callback',
             state: state,
             duration: "permanent"
         }))
@@ -90,7 +89,7 @@ export const store_tokens = async (req, res) => {
                     var ret = await add_tokens(req.user.userid, access_token, refresh_token, expires_in, 'reddit')
                     if (ret.ret_value === true) {
                         // TODO: maybe use state as redirect URL
-                        // res.redirect('http://127.0.0.1:8080/github/login?' +
+                        // res.redirect('https://karl-area-server.herokuapp.com/github/login?' +
                         //     querystring.stringify({
                         //         access_token: access_token
                         //     }))

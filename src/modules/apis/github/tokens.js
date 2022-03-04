@@ -5,9 +5,9 @@ import { add_tokens } from '../../db/tokens.js'
 import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
-const client_id = 'dadc9341510fc3d05467';
-const client_secret = "8a28a862a28b166472c69381c7057d7318464628"
-const redirect_uri = 'http://127.0.0.1:8080/github/callback';
+const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'github'`)).rows[0].client_id;
+const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'github'`)).rows[0].client_secret
+const redirect_uri = 'https://karl-area-server.herokuapp.com/github/callback';
 
 export const unsubscribe = async (req, res) => {
     var user_id = req.user.userid
@@ -81,7 +81,7 @@ export const store_tokens = async (req, res) => {
                     var ret = await add_tokens(req.user.userid, access_token, refresh_token, 3542515691, 'github')
                     if (ret.ret_value === true) {
                         // TODO: maybe use state as redirect URL
-                        // res.redirect('http://127.0.0.1:8080/github/login?' +
+                        // res.redirect('https://karl-area-server.herokuapp.com/github/login?' +
                         //     querystring.stringify({
                         //         access_token: access_token
                         //     }))

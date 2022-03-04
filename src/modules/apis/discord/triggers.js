@@ -5,7 +5,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { createErrorMessage } from '../../Helper.js';
 import { client } from './bot.js';
-const rest = new REST({ version: '9' }).setToken('OTEzOTIxNzQ1ODM1MTU5NjIy.YaFh9A.VBuI_6EnDwX_3fik6uh3m195F9k');
+const rest = new REST({ version: '9' }).setToken((await db_adm_conn.query(`SELECT additional_token as token FROM services WHERE service_name = 'discord'`)).rows[0].token);
 
 export const createDiscordJoin = async (req, res) => {
     try{

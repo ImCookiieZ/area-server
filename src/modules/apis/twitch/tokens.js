@@ -5,9 +5,9 @@ import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
 
-export const client_secret = "pq6z83advavwoku5e5cg9xc9mzkalf"
-export const client_id = "30o6vog6b7nigqnnxyo6iajz70cvnu"
-export const redirect_uri = "http://localhost:8080/twitch/callback"
+export const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_secret;
+export const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_id;
+export const redirect_uri = "https://karl-area-server.herokuapp.com/twitch/callback"
 
 export const unsubscribe = async (req, res) => {
     var user_id = req.user.userid
@@ -29,7 +29,7 @@ export const login = async (req, res) => {
             response_type: 'code',
             client_id: '30o6vog6b7nigqnnxyo6iajz70cvnu',
             scope: scope,
-            redirect_uri: 'http://localhost:8080/twitch/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/twitch/callback',
             state: state
         }))
 }
@@ -46,7 +46,7 @@ export const loginApp = async (req, res) => {
             response_type: 'code',
             client_id: '30o6vog6b7nigqnnxyo6iajz70cvnu',
             scope: scope,
-            redirect_uri: 'http://localhost:8080/twitch/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/twitch/callback',
             state: state
         }))
 }
@@ -82,7 +82,7 @@ export const store_tokens = async (req, res) => {
                     var ret = await add_tokens(req.user.userid, access_token, refresh_token, expires_in, 'twitch')
                     if (ret.ret_value === true) {
                         // TODO: maybe use state as redirect URL
-                        // res.redirect('http://127.0.0.1:8080/github/login?' +
+                        // res.redirect('http://karl-area-server.herokuapp.com/github/login?' +
                         //     querystring.stringify({
                         //         access_token: access_token
                         //     }))

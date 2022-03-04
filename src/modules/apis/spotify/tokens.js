@@ -5,9 +5,9 @@ import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
 
-export const client_id = '15628e786638415eb6c9701f2574826b';
-export const client_secret = "2d85240a25f2487395ef8a8f0987d2c1"
-export const redirect_uri = 'http://127.0.0.1:8080/spotify/callback';
+export const client_id =  (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'spotify'`)).rows[0].client_id;
+export const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'spotify'`)).rows[0].client_secret;
+export const redirect_uri = 'https://karl-area-server.herokuapp.com/spotify/callback';
 
 export const unsubscribe = async (req, res) => {
     var user_id = req.user.userid
@@ -30,7 +30,7 @@ export const login = async (req, res) => {
             response_type: 'code',
             client_id: '15628e786638415eb6c9701f2574826b',
             scope: scope,
-            redirect_uri: 'http://127.0.0.1:8080/spotify/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/spotify/callback',
             state: state
         }))
 }
@@ -49,7 +49,7 @@ export const loginApp = async (req, res) => {
             response_type: 'code',
             client_id: '15628e786638415eb6c9701f2574826b',
             scope: scope,
-            redirect_uri: 'http://127.0.0.1:8080/spotify/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/spotify/callback',
             state: state
         }))
 }
@@ -83,7 +83,7 @@ export const store_tokens = async (req, res) => {
                     var ret = await add_tokens(req.user.userid, access_token, refresh_token, expires_in, 'spotify')
                     if (ret.ret_value === true) {
                         // TODO: maybe use state as redirect URL
-                        // res.redirect('http://127.0.0.1:8080/github/login?' +
+                        // res.redirect('https://karl-area-server.herokuapp.com/github/login?' +
                         //     querystring.stringify({
                         //         access_token: access_token
                         //     }))

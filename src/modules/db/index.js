@@ -10,9 +10,9 @@ console.log('this is db_vars:',
 //const connectionString =  'postgres://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + DB_STRING
 
 // const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`;
-const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@db:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`;
+// const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`;
 //const connectionString =  process.env.NODE_ENV === 'production' ? process.env.DATABASE_URL : `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}${DB_STRING}`
-
+const connectionString = `postgres://fphgtinwnavwdu:0786248f82aa6cb142ca9c141cbd6460fe9337a39cc9abd737cde9476952ef6e@ec2-52-211-158-144.eu-west-1.compute.amazonaws.com:5432/dmsevog1qj8o`
 
 export const poolExample = (req, res) => {
 
@@ -60,6 +60,9 @@ export let db_adm_conn;
 // if (process.env.NODE_ENV !== 'production') {
 db_adm_conn = new Client({
     connectionString,
+    ssl: {
+        rejectUnauthorized: false
+      }
 });
 
 // } else {

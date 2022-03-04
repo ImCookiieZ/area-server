@@ -29,6 +29,7 @@ import { checkTokens, checkTriggers } from "./src/modules/triggers/daemon.js"
 import cookieParser from 'cookie-parser';
 // import jwt from 'express-jwt';
 import cors from 'cors'; //dont know what is it for
+import db_adm_conn from './src/modules/db/index.js'
 // import { poolExample } from './src/modules/db/index.js'
 // import { dbPool2 } from './src/modules/sketches/herokupgsql.js'
 const options = {
@@ -90,5 +91,5 @@ app.use(logger);
 server.listen(PORT, () => console.log(`[LOGGER] The server is listening on port ${PORT}`))
 await checkTokens()
 
-await dc_bot_client.login('OTEzOTIxNzQ1ODM1MTU5NjIy.YaFh9A.VBuI_6EnDwX_3fik6uh3m195F9k');
+await dc_bot_client.login((await db_adm_conn.query(`SELECT additional_token as token FROM services WHERE service_name = 'discord'`)).rows[0].token);
 checkTriggers();

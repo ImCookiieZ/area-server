@@ -4,9 +4,9 @@ import { add_tokens, get_id_by_name, update_tokens, get_refresh_token } from '..
 import {checkInputBeforeSqlQuery, createErrorMessage} from '../../Helper.js';
 import db_adm_conn from '../../db/index.js';
 
-export const client_id = '913921745835159622';
-const client_secret = "nPmHla0Ne1E-Hwfk6Pr8gF1XwMcijoG3"
-const redirect_uri = 'http://127.0.0.1:8080/discord/callback';
+export const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'discord'`)).rows[0].client_id;
+const client_secret = (await db_adm_conn.query(`SELECT client_secret FROM services WHERE service_name = 'discord'`)).rows[0].client_secret
+const redirect_uri = 'https://karl-area-server.herokuapp.com/discord/callback';
 
 export const unsubscribe = async (req, res) => {
     var user_id = req.user.userid
@@ -25,7 +25,7 @@ export const login = async (req, res) => {
     }
     var scope = 'bot applications.commands'//'email guilds identify connections messages.read' //' rpc';
     var permissions = '490858582'
-    res.header('Origin', "http://127.0.0.1:8080")
+    res.header('Origin', "https://karl-area-server.herokuapp.com")
 
     res.send('https://discord.com/api/oauth2/authorize?' +
         querystring.stringify({
@@ -33,7 +33,7 @@ export const login = async (req, res) => {
             client_id: '913921745835159622',
             scope: scope,
             permissions: permissions,
-            redirect_uri: 'http://127.0.0.1:8080/discord/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/discord/callback',
             state: state,
             prompt: "consent",
         }))
@@ -48,7 +48,7 @@ export const loginApp = async (req, res) => {
     }
     var scope = 'bot applications.commands'//'email guilds identify connections messages.read' //' rpc';
     var permissions = '490858582'
-    res.header('Origin', "http://127.0.0.1:8080")
+    res.header('Origin', "https://karl-area-server.herokuapp.com")
 
     res.redirect('https://discord.com/api/oauth2/authorize?' +
         querystring.stringify({
@@ -56,7 +56,7 @@ export const loginApp = async (req, res) => {
             client_id: '913921745835159622',
             scope: scope,
             permissions: permissions,
-            redirect_uri: 'http://127.0.0.1:8080/discord/callback',
+            redirect_uri: 'https://karl-area-server.herokuapp.com/discord/callback',
             state: state,
             prompt: "consent",
         }))
@@ -93,7 +93,7 @@ export const store_tokens = async (req, res) => {
                     var ret = await add_tokens(req.user.userid, access_token, refresh_token, expires_in, 'discord')
                     if (ret.ret_value === true) {
                         // TODO: maybe use state as redirect URL
-                        // res.redirect('http://127.0.0.1:8080/github/login?' +
+                        // res.redirect('https://karl-area-server.herokuapp.com/github/login?' +
                         //     querystring.stringify({
                         //         access_token: access_token
                         //     }))
