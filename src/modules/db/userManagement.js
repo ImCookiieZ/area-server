@@ -29,7 +29,9 @@ export const createUser = async (req, res) => {
         const token = jwt.sign({ userid: userid }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.cookie("YEPAreaToken", token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            Secure: true
+
         });
         res.status(200).send(token);
         return;
@@ -68,7 +70,8 @@ export const login = async (req, res) => {
         const token = jwt.sign({ userid: userid }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.cookie("YEPAreaToken", token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            Secure: true
         });
         res.status(200).send(token);
         return;

@@ -96,8 +96,9 @@ export const store_tokens = async (req, res) => {
                         //TODO: redirect to own webpage
                         res.cookie("YEPAreaToken", state, {
                             httpOnly: true,
-                            maxAge: 24 * 60 * 60 * 1000
-                        });
+                            maxAge: 24 * 60 * 60 * 1000,
+                            Secure: true
+        });
                         res.redirect("http://localhost:3000/profile")
                         // res.send({ access_token: access_token, refresh_token: refresh_token, expires_in: expires_in })
                     } else {

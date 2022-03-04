@@ -57,6 +57,8 @@ export const secureCallback = (req, res, next) => {
                 throw "user does not exist"
             res.cookie("YEPAreaToken", token, {
                 httpOnly: true,
+                Secure: true
+
             });
             next();
         } catch (error) {
