@@ -74,7 +74,9 @@ export const store_tokens = async (req, res) => {
                 },
                 json: true
             };
-
+            console.log(authOptions)
+            console.log(client_id)
+            console.log(client_secret)
             request.post(authOptions, async (error, response, body) => {
                 if (!error && response.statusCode === 200) {
                     var access_token = body.access_token,
