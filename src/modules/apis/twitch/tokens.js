@@ -5,7 +5,7 @@ import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
 
-export const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_secret;
+export const client_secret = (await db_adm_conn.query(`SELECT client_secret FROM services WHERE service_name = 'twitch'`)).rows[0].client_secret;
 export const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_id;
 export const redirect_uri = "https://karl-area-server.herokuapp.com/twitch/callback"
 
