@@ -66,7 +66,7 @@ export const store_tokens = async (req, res) => {
                     code: code,
                     redirect_uri: redirect_uri,
                     grant_type: 'authorization_code',
-                    client_id: client_id,
+                    client_id:  (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_id,
                     client_secret: client_secret
                 },
                 headers: {
