@@ -105,7 +105,8 @@ export const store_tokens = async (req, res) => {
                         res.status(500).send(createErrorMessage(err.stack))
                     } else {
                         console.log(response.statusCode)
-                        console.log(error)
+                        console.log("body:\n" + body)
+                        console.log("response:\n" + response)
                         res.status(403).send(createErrorMessage("Invalid Token"))
                     }
                 }
