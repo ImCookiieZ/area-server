@@ -28,17 +28,17 @@ export const secureRouteMiddleware = (req, res, next) => {
         }
     } else
         if (typeof header_token != "undefined" && header_token != null) {
-            console.log("header1: ", header_token)
             try {
                 if (header_token.indexOf("Bearer ") != 0)
                     throw "no valid bearer"
                 header_token = header_token.substring(7)
-            console.log("header2: ", header_token)
             const user = jwt.verify(header_token, process.env.JWT_SECRET);
                 req.user = user;
-                if (!checkUserExists(user))
+                console.log(user)
+                if (!checkUserExists(user)){
+                    console.log("user not existing")
                     res.status(401).send(createErrorMessage("401 Unauthorized User does not exist"));
-                else
+                }else
                     next();
             } catch (error) {
                 res.status(401).send(createErrorMessage("401 Unauthorized"));
