@@ -10,7 +10,7 @@ import mainRouter from './src/routes/index.mjs'; //DIR_IMPORT NOT SUPPORTED
 // import productRouter from './src/routes/productRoutes.mjs'; //DIR_IMPORT NOT SUPPORTED
 // import settingRouter from './src/routes/settingsRoutes.mjs'; //DIR_IMPORT NOT SUPPORTED
 import userRouter from './src/routes/user.mjs'; //DIR_IMPORT NOT SUPPORTED
-import discordRouter from './src/modules/apis/discord/index.mjs'; //DIR_IMPORT NOT SUPPORTED
+// import discordRouter from './src/modules/apis/discord/index.mjs'; //DIR_IMPORT NOT SUPPORTED
 import githubRouter from './src/modules/apis/github/index.mjs'; //DIR_IMPORT NOT SUPPORTED
 import twitchRouter from './src/modules/apis/twitch/index.mjs'; //DIR_IMPORT NOT SUPPORTED
 import spotifyRouter from './src/modules/apis/spotify/index.mjs'; //DIR_IMPORT NOT SUPPORTED
@@ -74,7 +74,7 @@ app.use((req, res, next) => {
 });
 app.use(mainRouter);
 app.use(userRouter);
-app.use(discordRouter);
+// app.use(discordRouter);
 app.use(githubRouter);
 app.use(twitchRouter);
 app.use(spotifyRouter);
@@ -91,5 +91,5 @@ app.use(logger);
 server.listen(PORT, () => console.log(`[LOGGER] The server is listening on port ${PORT}`))
 await checkTokens()
 
-await dc_bot_client.login((await db_adm_conn.query(`SELECT additional_token as token FROM services WHERE service_name = 'discord'`)).rows[0].token);
+// await dc_bot_client.login((await db_adm_conn.query(`SELECT additional_token as token FROM services WHERE service_name = 'discord'`)).rows[0].token);
 checkTriggers();
