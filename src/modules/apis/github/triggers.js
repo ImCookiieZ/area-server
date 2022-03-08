@@ -18,7 +18,7 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
         var gh = new GitHub({
             token: access_token
         });
-        console.log("after gh")
+        console.log("gh:", gh)
 
         var commands_res = await db_adm_conn.query(`
         SELECT tr.trigger_reaction_id as id, r.reaction_name as type
@@ -28,14 +28,14 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
         JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
         WHERE ut.user_trigger_id = '${user_trigger_id}' 
     `)
-        console.log("after query")
 
 
         var fork = await gh.getRepo(info.github_username, info.github_repo_name);
-        console.log("after fork")
+        console.log("fork:", fork)
 
         var commits = await fork.listCommits({}, () => { })
         console.log("commits:", commits)
+        console.log("commits2:", fork.listCommits())
 
         let ret = []
 
