@@ -6,7 +6,7 @@ import { checkInputBeforeSqlQuery, createErrorMessage } from '../../Helper.js';
 
 import db_adm_conn from "../../db/index.js";
 const client_id = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'github'`)).rows[0].client_id;
-const client_secret = (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'github'`)).rows[0].client_secret
+const client_secret = (await db_adm_conn.query(`SELECT client_secret FROM services WHERE service_name = 'github'`)).rows[0].client_secret
 const redirect_uri = 'https://karl-area-server.herokuapp.com/github/callback';
 
 export const unsubscribe = async (req, res) => {
