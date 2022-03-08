@@ -33,9 +33,9 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
         var fork = await gh.getRepo(info.github_username, info.github_repo_name);
         console.log("fork:", fork)
 
-        var commits = await fork.listCommits({}, () => { })
+        var commits = await fork.listCommits()
         console.log("commits:", commits)
-        console.log("commits2:", fork.listCommits())
+        console.log("commits2:", await fork.listCommits())
 
         let ret = []
 
