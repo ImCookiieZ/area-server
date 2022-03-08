@@ -58,6 +58,7 @@ const checkForNewPostsInSubreddit = async (subreddit_name, user_id, lastchecked,
 
 
 export const checkPostOnSubredditTrigger = async () => {
+    try {
     var res = await getTriggerInfo('post-subreddit')
     let triggers = [];
 
@@ -86,7 +87,9 @@ export const checkPostOnSubredditTrigger = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
-        await checkForNewPostsInSubreddit(triggers[i].subreddit_name, triggers[i].user_id, triggers[i].lastchecked, triggers[i].user_trigger_id)
+        try {
+            await checkForNewPostsInSubreddit(triggers[i].subreddit_name, triggers[i].user_id, triggers[i].lastchecked, triggers[i].user_trigger_id)
+        } catch {}
     }
 
     var current_time = Math.floor((new Date().getTime() - 2) / 1000); //seconds since epoch
@@ -101,6 +104,7 @@ export const checkPostOnSubredditTrigger = async () => {
     }
     quer += `)`
     await db_adm_conn.query(quer)
+} catch {}
 }
 
 

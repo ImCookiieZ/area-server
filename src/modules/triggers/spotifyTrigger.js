@@ -2,6 +2,7 @@ import db_adm_conn from "../db/index.js"
 import { checkForNewSongsInPlaylist } from "../apis/spotify/triggers.js"
 
 export const checkPlaylistTrigger = async () => {
+    try {
     var db_res = await db_adm_conn.query(`
     SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
     FROM user_trigger ut
@@ -55,6 +56,7 @@ export const checkPlaylistTrigger = async () => {
     }
     quer += `)`
     var db_update = await db_adm_conn.query(quer)
+}catch {}
 }
 
 

@@ -53,11 +53,13 @@ const checkReddit = async () => {
 }
 
 export const checkTriggers = async () => {
-    await checkTokens()
-    await checkPlaylistTrigger()
-    // await checkQueueTrigger() not possible :(
-    //await checkLiveTrigger()
-    await checkReddit();
-    await checkGithub();
-    setTimeout(checkTriggers, 2 * 60 * 1000)
+    try {
+        await checkTokens()
+        await checkPlaylistTrigger()
+        // await checkQueueTrigger() not possible :(
+        await checkLiveTrigger()
+        await checkReddit();
+        await checkGithub();
+        setTimeout(checkTriggers, 2 * 60 * 1000)
+    } catch {}
 }

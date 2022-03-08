@@ -41,41 +41,45 @@ const checkUpvotes = async (upvotes, user_id, post_id, user_trigger_id) => {
 
 
 export const checkPostUpvote = async () => {
-    var res = await getTriggerInfo('post-upvote')
-    let triggers = [];
+    try {
+        var res = await getTriggerInfo('post-upvote')
+        let triggers = [];
 
-    for (let i = 0; i < res.rows.length; i += 2) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
+        for (let i = 0; i < res.rows.length; i += 2) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
 
-        if (cur.argument_name == "post_id") {
-            triggers.push({
-                upvote: next.argument_value,
-                post_id: cur.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
-        } else {
-            triggers.push({
-                upvote: cur.argument_value,
-                post_id: next.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
+            if (cur.argument_name == "post_id") {
+                triggers.push({
+                    upvote: next.argument_value,
+                    post_id: cur.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            } else {
+                triggers.push({
+                    upvote: cur.argument_value,
+                    post_id: next.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            }
         }
-    }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkUpvotes(triggers[i].upvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
-        await db_adm_conn.query(`
-            UPDATE trigger_arguments
-            SET argument_value = ${current_upvotes}
-            WHERE argument_name = 'upvote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
-        `)
-    }
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+            const current_upvotes = await checkUpvotes(triggers[i].upvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
+            await db_adm_conn.query(`
+                UPDATE trigger_arguments
+                SET argument_value = ${current_upvotes}
+                WHERE argument_name = 'upvote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
+            `)
+            } catch {}
+        }
+    } catch {}
 }
 
 const createPostVote = async (req, res, kind) => {
@@ -169,41 +173,45 @@ const checkEachVoteChange = async (last_votes, user_id, post_id, user_trigger_id
 }
 
 export const checkPostVoteChange = async () => {
-    var res = await getTriggerInfo('post-vote')
-    let triggers = []
+    try {
+        var res = await getTriggerInfo('post-vote')
+        let triggers = []
 
-    for (let i = 0; i < res.rows.length; i += 2) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
+        for (let i = 0; i < res.rows.length; i += 2) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
 
-        if (cur.argument_name == "post_id") {
-            triggers.push({
-                last_votes: next.argument_value,
-                post_id: cur.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
-        } else {
-            triggers.push({
-                last_votes: cur.argument_value,
-                post_id: next.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
+            if (cur.argument_name == "post_id") {
+                triggers.push({
+                    last_votes: next.argument_value,
+                    post_id: cur.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            } else {
+                triggers.push({
+                    last_votes: cur.argument_value,
+                    post_id: next.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            }
         }
-    }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkEachVoteChange(triggers[i].last_votes, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
-        await db_adm_conn.query(`
-            UPDATE trigger_arguments
-            SET argument_value = ${current_upvotes}
-            WHERE argument_name = 'vote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
-        `)
-    }
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+                const current_upvotes = await checkEachVoteChange(triggers[i].last_votes, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
+            await db_adm_conn.query(`
+                UPDATE trigger_arguments
+                SET argument_value = ${current_upvotes}
+                WHERE argument_name = 'vote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
+            `)
+            } catch {}
+        }
+    } catch {}
 }
 
 export const createPostVoteChanged = async (req, res) => {
@@ -248,42 +256,46 @@ const checkDownvotes = async (upvotes, user_id, post_id, user_trigger_id) => {
     return current_upvotes
 }
 
-export const checkPostDownvote = async () => {
-    var res = await getTriggerInfo('post-downvote')
-    let triggers = [];
+export const checkPostDownvote = async () => { 
+    try {
+        var res = await getTriggerInfo('post-downvote')
+        let triggers = [];
 
-    for (let i = 0; i < res.rows.length; i += 2) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
+        for (let i = 0; i < res.rows.length; i += 2) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
 
-        if (cur.argument_name == "post_id") {
-            triggers.push({
-                downvote: next.argument_value,
-                post_id: cur.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
-        } else {
-            triggers.push({
-                downvote: cur.argument_value,
-                post_id: next.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
+            if (cur.argument_name == "post_id") {
+                triggers.push({
+                    downvote: next.argument_value,
+                    post_id: cur.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            } else {
+                triggers.push({
+                    downvote: cur.argument_value,
+                    post_id: next.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            }
         }
-    }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkDownvotes(triggers[i].downvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
-        await db_adm_conn.query(`
-            UPDATE trigger_arguments
-            SET argument_value = ${current_upvotes}
-            WHERE argument_name = 'downvote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
-        `)
-    }
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+                const current_upvotes = await checkDownvotes(triggers[i].downvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
+                await db_adm_conn.query(`
+                    UPDATE trigger_arguments
+                    SET argument_value = ${current_upvotes}
+                    WHERE argument_name = 'downvote' AND user_trigger_id = '${triggers[i].user_trigger_id}'
+                `)
+            } catch {}
+        }
+    } catch {}
 }
 
 
@@ -326,36 +338,40 @@ export const checkVotelimit = async (votelimit, user_id, post_id, user_trigger_i
 }
 
 export const checkPostVotelimit = async () => {
-    var res = await getTriggerInfo('post-votelimit')
-    let triggers = [];
+    try {
+        var res = await getTriggerInfo('post-votelimit')
+        let triggers = [];
 
-    for (let i = 0; i < res.rows.length; i += 2) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
+        for (let i = 0; i < res.rows.length; i += 2) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
 
-        if (cur.argument_name == "post_id") {
-            triggers.push({
-                votelimit: next.argument_value,
-                post_id: cur.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
-        } else {
-            triggers.push({
-                votelimit: cur.argument_value,
-                post_id: next.argument_value,
-                user_trigger_id: cur.user_trigger_id,
-                user_id: cur.user_id
-            })
+            if (cur.argument_name == "post_id") {
+                triggers.push({
+                    votelimit: next.argument_value,
+                    post_id: cur.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            } else {
+                triggers.push({
+                    votelimit: cur.argument_value,
+                    post_id: next.argument_value,
+                    user_trigger_id: cur.user_trigger_id,
+                    user_id: cur.user_id
+                })
+            }
         }
-    }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        await checkVotelimit(triggers[i].votelimit, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
-    }
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+                await checkVotelimit(triggers[i].votelimit, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
+            } catch {}
+        }
+    } catch {}
 }
 
 export const createPostVotelimit = async (req, res) => {

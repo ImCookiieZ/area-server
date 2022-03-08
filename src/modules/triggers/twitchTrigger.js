@@ -4,6 +4,7 @@ import { get_access_token } from '../../modules/db/tokens.js';
 import db_adm_conn from '../db/index.js';
 import { client_id } from '../apis/twitch/tokens.js';
 export const checkLiveTrigger = async () => {
+    try {
     var db_res = await db_adm_conn.query(`
     SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
     FROM user_trigger ut
@@ -57,6 +58,7 @@ export const checkLiveTrigger = async () => {
     }
     quer += `)`
     var db_update = await db_adm_conn.query(quer)
+} catch {}
 }
 export const setChannelLiveState = async (channel_name, live_state, channel_user_id) => {
     var qu = `

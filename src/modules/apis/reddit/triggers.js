@@ -45,6 +45,7 @@ const checkForNewPostInFeed = async (user_id, latest_time, user_trigger_id) => {
 }
 
 export const checkPostOnFeedTrigger = async () => {
+    try {
     var res = await getTriggerInfo('post-feed')
     let triggers = [];
 
@@ -61,9 +62,11 @@ export const checkPostOnFeedTrigger = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
+        try {
         const ret = await checkForNewPostInFeed(triggers[i].user_id, triggers[i].lastchecked, triggers[i].user_trigger_id)
         if (!ret)
             return null
+            }    catch {}
     }
 
     var current_time = Math.floor((new Date().getTime() - 2) / 1000);
@@ -78,6 +81,7 @@ export const checkPostOnFeedTrigger = async () => {
     }
     quer += `)`
     return await db_adm_conn.query(quer)
+    } catch {}
 }
 
 export const createLastPostOnFeed = async (req, res) => {

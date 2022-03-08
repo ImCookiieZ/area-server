@@ -59,51 +59,54 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
 }
 
 export const checkGithubPush = async () => {
-    var res = await db_adm_conn.query(`
-        SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
-            FROM user_trigger ut
-                JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
-                JOIN triggers t ON t.trigger_id = ut.trigger_id
-            WHERE t.trigger_name = 'repo-push'
-            ORDER BY ta.user_trigger_id, ta.argument_name
-    `)
-    let triggers = [];
+    try {
+        var res = await db_adm_conn.query(`
+            SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
+                FROM user_trigger ut
+                    JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+                    JOIN triggers t ON t.trigger_id = ut.trigger_id
+                WHERE t.trigger_name = 'repo-push'
+                ORDER BY ta.user_trigger_id, ta.argument_name
+        `)
+        let triggers = [];
 
-    for (let i = 0; i < res.rows.length; i += 3) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
-        const nextnext = res.rows[i + 2];
-        triggers.push({
-            github_repo_name: cur.argument_value,
-            github_username: next.argument_value,
-            lastchecked: nextnext.argument_value,
-            user_trigger_id: cur.user_trigger_id,
-            user_id: cur.user_id
-        })
-    }
+        for (let i = 0; i < res.rows.length; i += 3) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
+            const nextnext = res.rows[i + 2];
+            triggers.push({
+                github_repo_name: cur.argument_value,
+                github_username: next.argument_value,
+                lastchecked: nextnext.argument_value,
+                user_trigger_id: cur.user_trigger_id,
+                user_id: cur.user_id
+            })
+        }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        console.log(`Github Push: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}]`)
-        const ret = await checkEachGithubPush(triggers[i], triggers[i].user_trigger_id)
-        if (!ret)
-            return null
-    }
-
-    var current_time = Math.floor((new Date().getTime() - 2) / 1000);
-    var quer = `
-    UPDATE trigger_arguments
-    SET argument_value = '${current_time}'
-    WHERE argument_name = 'lastchecked' AND user_trigger_id IN (`
-    for (var i = 0; i < triggers.length; i++) {
-        quer += `'${triggers[i].user_trigger_id}'`
-        if (i < triggers.length - 1)
-            quer += `, `
-    }
-    quer += `)`
-    return await db_adm_conn.query(quer)
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+                console.log(`Github Push: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}]`)
+                const ret = await checkEachGithubPush(triggers[i], triggers[i].user_trigger_id)
+                if (!ret)
+                    return null
+                } catch {}
+            }
+        var current_time = Math.floor((new Date().getTime() - 2) / 1000);
+        var quer = `
+        UPDATE trigger_arguments
+        SET argument_value = '${current_time}'
+        WHERE argument_name = 'lastchecked' AND user_trigger_id IN (`
+        for (var i = 0; i < triggers.length; i++) {
+            quer += `'${triggers[i].user_trigger_id}'`
+            if (i < triggers.length - 1)
+                quer += `, `
+        }
+        quer += `)`
+        return await db_adm_conn.query(quer)
+    } catch {}
 }
 
 
@@ -211,6 +214,7 @@ const checkEachGithubPR = async (info, user_trigger_id) => {
 }
 
 export const checkGithubPR = async() => {
+    try {
     console.log("Checking github pr's")
     var res = await db_adm_conn.query(`
         SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
@@ -240,10 +244,12 @@ export const checkGithubPR = async() => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
+        try {
         console.log(`Github PR: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}], id = ${triggers[i].user_id}`)
         const ret = await checkEachGithubPR(triggers[i], triggers[i].user_trigger_id)
         if (!ret)
             return null
+        } catch {}
     }
 
     var current_time = Math.floor((new Date().getTime() - 2) / 1000);
@@ -258,6 +264,7 @@ export const checkGithubPR = async() => {
     }
     quer += `)`
     return await db_adm_conn.query(quer)
+} catch {}
 }
 
 export const createGithubPRTrigger = async (req, res) => {
