@@ -12,7 +12,7 @@ console.log('this is db_vars:',
 // const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@localhost:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`;
 // const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`;
 //const connectionString =  process.env.NODE_ENV === 'production' ? process.env.DATABASE_URL : `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}${DB_STRING}`
-const connectionString = `postgres://fphgtinwnavwdu:0786248f82aa6cb142ca9c141cbd6460fe9337a39cc9abd737cde9476952ef6e@ec2-52-211-158-144.eu-west-1.compute.amazonaws.com:5432/dmsevog1qj8o`
+const connectionString = `postgres://lfhuvxpuwdgvew:f53fa74258296c7cf1b8a18a5dd39ad2f8b3d459ef63b74d8bbb3fd0bc270866@ec2-54-73-178-126.eu-west-1.compute.amazonaws.com:5432/dc7pnn7cj0ruiu`
 
 export const poolExample = (req, res) => {
 
