@@ -8,14 +8,15 @@ import { handleReactions } from '../../reactions/checkForReaction.js'
 //https://not-an-aardvark.github.io/snoowrap/index.html
 
 const checkEachGithubPush = async (info, user_trigger_id) => {
-    const access_token = await get_access_token('github', info.user_id);
-    if (access_token == null)
-        return null;
-    var gh = new GitHub({
-        token: access_token
-    });
+    try {
+        const access_token = await get_access_token('github', info.user_id);
+        if (access_token == null)
+            return null;
+        var gh = new GitHub({
+            token: access_token
+        });
 
-    var commands_res = await db_adm_conn.query(`
+        var commands_res = await db_adm_conn.query(`
         SELECT tr.trigger_reaction_id as id, r.reaction_name as type
         FROM trigger_reactions tr
         JOIN reactions r ON tr.reaction_id = r.reaction_id
@@ -25,37 +26,40 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
     `)
 
 
-    var fork = await gh.getRepo(info.github_username, info.github_repo_name);
+        var fork = await gh.getRepo(info.github_username, info.github_repo_name);
 
-    var commits = await fork.listCommits({}, () => {})
+        var commits = await fork.listCommits({}, () => { })
 
-    let ret = []
+        let ret = []
 
-    commits = commits["data"]
+        commits = commits["data"]
 
-    for (let i = 0; i < commits.length; i++) {
-        const commit = commits[i]["commit"]
-        const tm = commit["author"]["date"]
-        const dateString = new Date((tm || "").replace(/-/g,"/").replace(/[TZ]/g," "));
-        const secs = dateString.getTime() / 1000
-        const name = commit["author"]["name"]
-        const email = commit["author"]["email"]
-        const msg = commit["message"]
+        for (let i = 0; i < commits.length; i++) {
+            try {
+                const commit = commits[i]["commit"]
+                const tm = commit["author"]["date"]
+                const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+                const secs = dateString.getTime() / 1000
+                const name = commit["author"]["name"]
+                const email = commit["author"]["email"]
+                const msg = commit["message"]
 
-        //console.log("msg:", msg, "at", tm, "\nsecs:", secs, "\nlast:", info.lastchecked, "\ndiff:", secs - info.lastchecked, "\n\n")
-        if (secs + 3600 > info.lastchecked) {
-            ret.push({
-                id: commands_res.rows[0].id,
-                type: commands_res.rows[0].type,
-                message: `New commit\n  - from: ${name} (${email})\n  - at ${tm}\n  - with msg: "${msg}`,
-                argument: ""
-            });
-        } else {
-            break;
+                //console.log("msg:", msg, "at", tm, "\nsecs:", secs, "\nlast:", info.lastchecked, "\ndiff:", secs - info.lastchecked, "\n\n")
+                if (secs + 3600 > info.lastchecked) {
+                    ret.push({
+                        id: commands_res.rows[0].id,
+                        type: commands_res.rows[0].type,
+                        message: `New commit\n  - from: ${name} (${email})\n  - at ${tm}\n  - with msg: "${msg}`,
+                        argument: ""
+                    });
+                } else {
+                    break;
+                }
+            } catch { }
         }
-    }
-    handleReactions(ret);
-    return ret;
+        handleReactions(ret);
+        return ret;
+    } catch { }
 }
 
 export const checkGithubPush = async () => {
@@ -92,8 +96,8 @@ export const checkGithubPush = async () => {
                 const ret = await checkEachGithubPush(triggers[i], triggers[i].user_trigger_id)
                 if (!ret)
                     return null
-                } catch {}
-            }
+            } catch { }
+        }
         var current_time = Math.floor((new Date().getTime() - 2) / 1000);
         var quer = `
         UPDATE trigger_arguments
@@ -106,7 +110,7 @@ export const checkGithubPush = async () => {
         }
         quer += `)`
         return await db_adm_conn.query(quer)
-    } catch {}
+    } catch { }
 }
 
 
@@ -193,7 +197,7 @@ const checkEachGithubPR = async (info, user_trigger_id) => {
         const state = cur["state"]
 
         const tm = cur["updated_at"]
-        const dateString = new Date((tm || "").replace(/-/g,"/").replace(/[TZ]/g," "));
+        const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
         const secs = dateString.getTime() / 1000
 
         const username = cur["user"]["login"]
@@ -213,10 +217,10 @@ const checkEachGithubPR = async (info, user_trigger_id) => {
     return ret;
 }
 
-export const checkGithubPR = async() => {
+export const checkGithubPR = async () => {
     try {
-    console.log("Checking github pr's")
-    var res = await db_adm_conn.query(`
+        console.log("Checking github pr's")
+        var res = await db_adm_conn.query(`
         SELECT ta.user_trigger_id, ta.argument_value, ta.argument_name, ut.user_id
             FROM user_trigger ut
                 JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
@@ -225,46 +229,46 @@ export const checkGithubPR = async() => {
             ORDER BY ta.user_trigger_id, ta.argument_name
     `)
 
-    let triggers = []
+        let triggers = []
 
-    for (let i = 0; i < res.rows.length; i += 3) {
-        const cur = res.rows[i];
-        const next = res.rows[i + 1];
-        const nextnext = res.rows[i + 2];
-        triggers.push({
-            github_repo_name: cur.argument_value,
-            github_username: next.argument_value,
-            lastchecked: nextnext.argument_value,
-            user_trigger_id: cur.user_trigger_id,
-            user_id: cur.user_id
-        })
-    }
+        for (let i = 0; i < res.rows.length; i += 3) {
+            const cur = res.rows[i];
+            const next = res.rows[i + 1];
+            const nextnext = res.rows[i + 2];
+            triggers.push({
+                github_repo_name: cur.argument_value,
+                github_username: next.argument_value,
+                lastchecked: nextnext.argument_value,
+                user_trigger_id: cur.user_trigger_id,
+                user_id: cur.user_id
+            })
+        }
 
-    if (triggers.length == 0)
-        return
+        if (triggers.length == 0)
+            return
 
-    for (var i = 0; i < triggers.length; i++) {
-        try {
-        console.log(`Github PR: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}], id = ${triggers[i].user_id}`)
-        const ret = await checkEachGithubPR(triggers[i], triggers[i].user_trigger_id)
-        if (!ret)
-            return null
-        } catch {}
-    }
+        for (var i = 0; i < triggers.length; i++) {
+            try {
+                console.log(`Github PR: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}], id = ${triggers[i].user_id}`)
+                const ret = await checkEachGithubPR(triggers[i], triggers[i].user_trigger_id)
+                if (!ret)
+                    return null
+            } catch { }
+        }
 
-    var current_time = Math.floor((new Date().getTime() - 2) / 1000);
-    var quer = `
+        var current_time = Math.floor((new Date().getTime() - 2) / 1000);
+        var quer = `
     UPDATE trigger_arguments
     SET argument_value = '${current_time}'
     WHERE argument_name = 'lastchecked' AND user_trigger_id IN (`
-    for (var i = 0; i < triggers.length; i++) {
-        quer += `'${triggers[i].user_trigger_id}'`
-        if (i < triggers.length - 1)
-            quer += `, `
-    }
-    quer += `)`
-    return await db_adm_conn.query(quer)
-} catch {}
+        for (var i = 0; i < triggers.length; i++) {
+            quer += `'${triggers[i].user_trigger_id}'`
+            if (i < triggers.length - 1)
+                quer += `, `
+        }
+        quer += `)`
+        return await db_adm_conn.query(quer)
+    } catch { }
 }
 
 export const createGithubPRTrigger = async (req, res) => {
