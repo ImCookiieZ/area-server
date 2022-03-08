@@ -2,6 +2,8 @@ import db_adm_conn from "../db/index.js"
 import { sendMessage as dc_message} from "../apis/discord/reactions.js"
 import { sendMessage as tw_message} from "../apis/twitch/reactions.js"
 import { addSongToPlaylist, addSongToQueue } from "../apis/spotify/reactions.js"
+import { upvoteRedditPost } from "../apis/reddit/reactions.js"
+
 export const handleReactions = (reactions) => {
     console.log(reactions)
     var executed = false
@@ -23,6 +25,11 @@ export const handleReactions = (reactions) => {
                 tw_message(row)
                 executed = true
                 break;
+            case ('vote'):
+                upvoteRedditPost(row)
+                executed = true
+                break;
+
             default:
                 console.log('case not defined')
         }

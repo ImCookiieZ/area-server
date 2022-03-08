@@ -3,10 +3,11 @@ import db_adm_conn from '../../db/index.js'
 import GitHub from "github-api"
 import { get_access_token } from '../../db/tokens.js'
 import { getTriggerId } from '../../db/trigger.js'
+import { handleReactions } from '../../reactions/checkForReaction.js'
 
 //https://not-an-aardvark.github.io/snoowrap/index.html
 
-const checkEachGithubPush = async (info) => {
+const checkEachGithubPush = async (info, user_trigger_id) => {
     const access_token = await get_access_token('github', info.user_id);
     if (access_token == null)
         return null;
@@ -14,42 +15,19 @@ const checkEachGithubPush = async (info) => {
         token: access_token
     });
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
+
+
     var fork = await gh.getRepo(info.github_username, info.github_repo_name);
 
     var commits = await fork.listCommits({}, () => {})
-
-    //@todo both of them work, but how can we need to set the url correct and localhost is not allowed
-    /* ---- const config = {
-    "name": "web",
-    "active": true,
-    "events": [
-        "commit"
-    ],
-    "config": {
-        //"url": "http://39a40427.ngrok.io/api/webhooks/incoming/github",
-        "url": "localhost:8080/welcome",
-        "content_type": "json"
-        }
-    };
-
-    var hookDef = {
-        "name" : "web",
-        "config" : {
-            "user" : info.github_username,
-            "secret" : access_token,
-            "url" : "https://google.com",
-            "content_type": "json"
-        },
-        "events" : ["push", "pull_request"],
-        "active" : true
-    }
-    fork.createHook(hookDef)
-        .then(function({data: hook}) {
-            console.log("A travis hook has been created which will trigger a build on push and pull request events...");
-            consle.log(hook)
-        }); ---- */
-
-    //console.log("---COMMIT", commits["data"][0], "================================", commits["data"][1])
 
     let ret = []
 
@@ -67,24 +45,16 @@ const checkEachGithubPush = async (info) => {
         //console.log("msg:", msg, "at", tm, "\nsecs:", secs, "\nlast:", info.lastchecked, "\ndiff:", secs - info.lastchecked, "\n\n")
         if (secs + 3600 > info.lastchecked) {
             ret.push({
-                committer_name: name,
-                committer_email: email,
-                timestamp: tm,
-                commit_message: msg
+                id: commands_res.rows[0].id,
+                type: commands_res.rows[0].type,
+                message: `New commit\n  - from: ${name} (${email})\n  - at ${tm}\n  - with msg: "${msg}`,
+                argument: ""
             });
         } else {
             break;
         }
     }
-
-    if (ret.length === 0) {
-        console.log("There is no new commit");
-    } else {
-        ret.forEach((elem) => {
-            console.log(`New commit\n  - from: ${elem.committer_name} (${elem.committer_email})\n  - at ${elem.timestamp}\n  - with msg: "${elem.commit_message}"`)
-        });
-    }
-
+    handleReactions(ret);
     return ret;
 }
 
@@ -117,7 +87,7 @@ export const checkGithubPush = async () => {
 
     for (var i = 0; i < triggers.length; i++) {
         console.log(`Github Push: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}]`)
-        const ret = await checkEachGithubPush(triggers[i])
+        const ret = await checkEachGithubPush(triggers[i], triggers[i].user_trigger_id)
         if (!ret)
             return null
     }
@@ -188,7 +158,7 @@ export const createGithubPushTrigger = async (req, res) => {
     res.status(201).send({ user_trigger_id: user_trigger_id })
 }
 
-const checkEachGithubPR = async (info) => {
+const checkEachGithubPR = async (info, user_trigger_id) => {
     const access_token = await get_access_token('github', info.user_id);
     if (access_token == null)
         return null;
@@ -196,6 +166,14 @@ const checkEachGithubPR = async (info) => {
         token: access_token
     });
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
 
     var fork = await gh.getRepo(info.github_username, info.github_repo_name);
 
@@ -217,27 +195,18 @@ const checkEachGithubPR = async (info) => {
 
         const username = cur["user"]["login"]
 
-        //console.log(`Title: ${title}, username: ${username}, state: ${state}, secs: ${secs}`)
-
         if (secs + 3600 > info.lastchecked) {
             ret.push({
-                title: title,
-                username: username,
-                state: state,
-                timestamp: tm,
+                id: commands_res.rows[0].id,
+                type: commands_res.rows[0].type,
+                message: `NEW PR (${title}) from ${username} at ${tm}. Status: ${state}`,
+                argument: ""
             });
         } else {
             break;
         }
     }
-
-    if (ret.length === 0) {
-        console.log("There is no new PR");
-    } else {
-        ret.forEach((elem) => {
-            console.log(`New pr\n  - from: ${elem.username} (${elem.title})\n  - at ${elem.timestamp}\n  - state: "${elem.state}"`)
-        });
-    }
+    handleReactions(ret)
     return ret;
 }
 
@@ -272,7 +241,7 @@ export const checkGithubPR = async() => {
 
     for (var i = 0; i < triggers.length; i++) {
         console.log(`Github PR: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}], id = ${triggers[i].user_id}`)
-        const ret = await checkEachGithubPR(triggers[i])
+        const ret = await checkEachGithubPR(triggers[i], triggers[i].user_trigger_id)
         if (!ret)
             return null
     }

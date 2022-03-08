@@ -3,8 +3,9 @@ import db_adm_conn from '../../db/index.js'
 import { getTriggerId } from '../../db/trigger.js'
 import { getClient, getTriggerInfo } from './helper.js'
 import { createErrorMessage } from '../../Helper.js';
+import { handleReactions } from '../../reactions/checkForReaction.js';
 
-const checkUpvotes = async (upvotes, user_id, post_id) => {
+const checkUpvotes = async (upvotes, user_id, post_id, user_trigger_id) => {
     if (!post_id)
         return
     var client = await getClient(user_id)
@@ -14,8 +15,26 @@ const checkUpvotes = async (upvotes, user_id, post_id) => {
     const sbm = await client.getSubmission(post_id)
     const current_upvotes = await sbm.score
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
+    let upvoted_post = []
+
     if (current_upvotes > upvotes) {
         console.log(`Post [${post_id}] has increased upvotes from ${upvotes} to ${current_upvotes}`)
+        upvoted_post.push({
+            id: commands_res.rows[0].id,
+            type: commands_res.rows[0].type,
+            message: `Post [${post_id}] has increased upvotes from ${upvotes} to ${current_upvotes}`,
+            argument: post_id
+        })
+
+        handleReactions(upvoted_post)
     }
     return current_upvotes
 }
@@ -50,7 +69,7 @@ export const checkPostUpvote = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkUpvotes(triggers[i].upvote, triggers[i].user_id, triggers[i].post_id)
+        const current_upvotes = await checkUpvotes(triggers[i].upvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
         await db_adm_conn.query(`
             UPDATE trigger_arguments
             SET argument_value = ${current_upvotes}
@@ -110,7 +129,7 @@ export const createPostUpvote = async (req, res) => {
     createPostVote(req, res, "upvote");
 }
 
-const checkEachVoteChange = async (last_votes, user_id, post_id) => {
+const checkEachVoteChange = async (last_votes, user_id, post_id, user_trigger_id) => {
     if (!post_id)
         return
 
@@ -121,11 +140,30 @@ const checkEachVoteChange = async (last_votes, user_id, post_id) => {
     const sbm = await client.getSubmission(post_id)
     const current_upvotes = await sbm.score
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
+
+    let voted_post = []
+
     if (current_upvotes != last_votes) {
         console.log(`Post [${post_id}] has changed the upvotes from ${last_votes} to ${current_upvotes}`)
+        voted_post.push({
+            id: commands_res.rows[0].id,
+            type:  commands_res.rows[0].type,
+            message: `Post [${post_id}] has changed the upvotes from ${last_votes} to ${current_upvotes}`,
+            argument: post_id
+        })
     } else {
         console.log(`Post [${post_id}] has not changed the upvotes and remains at ${current_upvotes}`)
     }
+
+    handleReactions(voted_post);
 
     return current_upvotes;
 }
@@ -159,7 +197,7 @@ export const checkPostVoteChange = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkEachVoteChange(triggers[i].last_votes, triggers[i].user_id, triggers[i].post_id)
+        const current_upvotes = await checkEachVoteChange(triggers[i].last_votes, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
         await db_adm_conn.query(`
             UPDATE trigger_arguments
             SET argument_value = ${current_upvotes}
@@ -173,7 +211,7 @@ export const createPostVoteChanged = async (req, res) => {
 }
 
 
-const checkDownvotes = async (upvotes, user_id, post_id) => {
+const checkDownvotes = async (upvotes, user_id, post_id, user_trigger_id) => {
     if (!post_id) {
         return
     }
@@ -185,9 +223,28 @@ const checkDownvotes = async (upvotes, user_id, post_id) => {
     const sbm = await client.getSubmission(post_id)
     const current_upvotes = await sbm.score
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
+
+    let downvoted_post = []
+
     if (current_upvotes < upvotes) {
         console.log(`Post [${post_id}] has decreased upvotes from ${upvotes} to ${current_upvotes}`)
+        downvoted_post.push({
+            id: commands_res.rows[0].id,
+            type:  commands_res.rows[0].type,
+            message: `Post [${post_id}] has decreased upvotes from ${upvotes} to ${current_upvotes}`,
+            argument: post_id
+        })
     }
+
+    handleReactions(downvoted_post)
     return current_upvotes
 }
 
@@ -220,7 +277,7 @@ export const checkPostDownvote = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
-        const current_upvotes = await checkDownvotes(triggers[i].downvote, triggers[i].user_id, triggers[i].post_id)
+        const current_upvotes = await checkDownvotes(triggers[i].downvote, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
         await db_adm_conn.query(`
             UPDATE trigger_arguments
             SET argument_value = ${current_upvotes}
@@ -234,7 +291,7 @@ export const createPostDownvote = async (req, res) => {
     createPostVote(req, res, "downvote");
 }
 
-export const checkVotelimit = async (votelimit, user_id, post_id) => {
+export const checkVotelimit = async (votelimit, user_id, post_id, user_trigger_id) => {
     if (!post_id)
         return
     var client = await getClient(user_id)
@@ -244,11 +301,28 @@ export const checkVotelimit = async (votelimit, user_id, post_id) => {
     const sbm = await client.getSubmission(post_id)
     const current_upvotes = await sbm.score
 
+    var commands_res = await db_adm_conn.query(`
+        SELECT tr.trigger_reaction_id as id, r.reaction_name as type
+        FROM trigger_reactions tr
+        JOIN reactions r ON tr.reaction_id = r.reaction_id
+        JOIN user_trigger ut ON tr.user_trigger_id = ut.user_trigger_id
+        JOIN trigger_arguments ta ON ta.user_trigger_id = ut.user_trigger_id
+        WHERE ut.user_trigger_id = '${user_trigger_id}' 
+    `)
+
+    let votelimit_reached_post = []
     if (current_upvotes >= votelimit) {
         console.log(`Post [${post_id}] has reached the upvotelimit of ${votelimit}`)
+        votelimit_reached_post.push({
+            id: commands_res.rows[0].id,
+            type:  commands_res.rows[0].type,
+            message: `Post [${post_id}] has reached the upvotelimit of ${votelimit}`,
+            argument: post_id
+        })
     } else {
         console.log(`Post [${post_id}] has NOT reached the upvotelimit of ${votelimit} with their ${current_upvotes} upvotes`)
     }
+    handleReactions(votelimit_reached_post)
 }
 
 export const checkPostVotelimit = async () => {
@@ -280,7 +354,7 @@ export const checkPostVotelimit = async () => {
         return
 
     for (var i = 0; i < triggers.length; i++) {
-        await checkVotelimit(triggers[i].votelimit, triggers[i].user_id, triggers[i].post_id)
+        await checkVotelimit(triggers[i].votelimit, triggers[i].user_id, triggers[i].post_id, triggers[i].user_trigger_id)
     }
 }
 
