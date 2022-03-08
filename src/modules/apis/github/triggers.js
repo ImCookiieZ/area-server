@@ -166,14 +166,15 @@ export const createGithubPushTrigger = async (req, res) => {
 }
 
 const checkEachGithubPR = async (info, user_trigger_id) => {
-    const access_token = await get_access_token('github', info.user_id);
-    if (access_token == null)
-        return null;
-    var gh = new GitHub({
-        token: access_token
-    });
+    try {
+        const access_token = await get_access_token('github', info.user_id);
+        if (access_token == null)
+            return null;
+        var gh = new GitHub({
+            token: access_token
+        });
 
-    var commands_res = await db_adm_conn.query(`
+        var commands_res = await db_adm_conn.query(`
         SELECT tr.trigger_reaction_id as id, r.reaction_name as type
         FROM trigger_reactions tr
         JOIN reactions r ON tr.reaction_id = r.reaction_id
@@ -182,39 +183,42 @@ const checkEachGithubPR = async (info, user_trigger_id) => {
         WHERE ut.user_trigger_id = '${user_trigger_id}' 
     `)
 
-    var fork = await gh.getRepo(info.github_username, info.github_repo_name);
+        var fork = await gh.getRepo(info.github_username, info.github_repo_name);
 
-    var pullrequests = await fork.listPullRequests({}, (s) => { console.log(s) })
+        var pullrequests = await fork.listPullRequests({}, (s) => { console.log(s) })
 
-    pullrequests = pullrequests["data"]
+        pullrequests = pullrequests["data"]
 
-    let ret = []
+        let ret = []
 
-    for (let i = 0; i < pullrequests.length; i++) {
-        const cur = pullrequests[i]
+        for (let i = 0; i < pullrequests.length; i++) {
+            try {
+                const cur = pullrequests[i]
 
-        const title = cur["title"]
-        const state = cur["state"]
+                const title = cur["title"]
+                const state = cur["state"]
 
-        const tm = cur["updated_at"]
-        const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
-        const secs = dateString.getTime() / 1000
+                const tm = cur["updated_at"]
+                const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+                const secs = dateString.getTime() / 1000
 
-        const username = cur["user"]["login"]
+                const username = cur["user"]["login"]
 
-        if (secs + 3600 > info.lastchecked) {
-            ret.push({
-                id: commands_res.rows[0].id,
-                type: commands_res.rows[0].type,
-                message: `NEW PR (${title}) from ${username} at ${tm}. Status: ${state}`,
-                argument: ""
-            });
-        } else {
-            break;
+                if (secs + 3600 > info.lastchecked) {
+                    ret.push({
+                        id: commands_res.rows[0].id,
+                        type: commands_res.rows[0].type,
+                        message: `NEW PR (${title}) from ${username} at ${tm}. Status: ${state}`,
+                        argument: ""
+                    });
+                } else {
+                    break;
+                }
+            } catch { }
         }
-    }
-    handleReactions(ret)
-    return ret;
+        handleReactions(ret)
+        return ret;
+    } catch { }
 }
 
 export const checkGithubPR = async () => {
