@@ -12,6 +12,7 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
         console.log("info: ", info)
         console.log("user trigger id: ", user_trigger_id)
         const access_token = await get_access_token('github', info.user_id);
+        console.log(access_token)
         if (access_token == null)
             return null;
         console.log("before gh")
