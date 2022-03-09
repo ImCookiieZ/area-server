@@ -18,7 +18,7 @@ export const unsubscribe = async (req, res) => {
 }
 export const login = async (req, res) => {
 
-    var state = req.cookies.YEPAreaToken || null;
+    var state = (req.cookies.YEPAreaToken || req.headers['authorization']) || null;
     if (state === null) {
         res.status(400).send(createErrorMessage("Missing access_token"))
         return
@@ -35,7 +35,7 @@ export const login = async (req, res) => {
 }
 export const loginApp = async (req, res) => {
 
-    var state = req.cookies.YEPAreaToken || null;
+    var state = (req.cookies.YEPAreaToken || req.headers['authorization']) || null;
     if (state === null) {
         res.status(400).send(createErrorMessage("Missing access_token"))
         return
