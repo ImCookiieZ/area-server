@@ -32,7 +32,7 @@ export const login = async (req, res) => {
     res.send('https://accounts.spotify.com/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '15628e786638415eb6c9701f2574826b',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/spotify/callback',
             state: state
@@ -55,7 +55,7 @@ export const loginApp = async (req, res) => {
     res.redirect('https://accounts.spotify.com/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '15628e786638415eb6c9701f2574826b',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/spotify/callback',
             state: state
@@ -82,9 +82,6 @@ export const store_tokens = async (req, res) => {
                 },
                 json: true
             };
-            console.log(authOptions)
-            console.log(client_id)
-            console.log(client_secret)
             request.post(authOptions, async (error, response, body) => {
                 if (!error && response.statusCode === 200) {
                     var access_token = body.access_token,
