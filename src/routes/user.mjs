@@ -151,5 +151,13 @@ router.get('/token', login);
 router.get('/login', login);
 router.get('/user/subscriptions', secureRouteMiddleware, getSubscriptions)
 router.get('/user/connections', secureRouteMiddleware, getConnections)
-
+router.get('/client.apk', (req, res) => {
+    console.log(__basedir)
+    res.download('../../data/client.apk', (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+    })
+})
 export default router;
