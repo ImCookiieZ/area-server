@@ -5,7 +5,7 @@ import path from 'path';
 const __dirname = path.resolve();
 
 export const down = async (req, res) => {
-    res.download(__dirname + '/userIndos.js', (error) => {
+    res.download(__dirname + '/data/client.apk', (error) => {
         if (error) {
             console.log(error)
             return
