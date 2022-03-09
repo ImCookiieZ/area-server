@@ -79,7 +79,7 @@ client.on('messageCreate', async message => {
         `)
         var items = []
         for (var row of commands_res.rows) {
-            items.push({id: row.id, type: row.type, commandname: row.commandname, argument: message.content.substring(message.content.indexOf(' ') + 1), message: "user send: " + message.content})
+            items.push({id: row.id, type: row.type, commandname: row.commandname, argument: message.content.substring(message.content.indexOf(' ') + 1), message: message.author.username + " send: " + message.content})
         }
         if (handleReactions(items))
             message.channel.send("command executed <3")
