@@ -102,8 +102,7 @@ export const checkGithubPush = async () => {
             try {
                 console.log(`Github Push: Entry ${i}: repo[${triggers[i].github_repo_name}], name[${triggers[i].github_username}]`)
                 const ret = await checkEachGithubPush(triggers[i], triggers[i].user_trigger_id)
-                if (!ret)
-                    return null
+               
             } catch { }
         }
         var current_time = Math.floor((new Date().getTime() - 2) / 1000);
@@ -117,6 +116,7 @@ export const checkGithubPush = async () => {
                 quer += `, `
         }
         quer += `)`
+        console.log(quer)
         return await db_adm_conn.query(quer)
     } catch { }
 }
