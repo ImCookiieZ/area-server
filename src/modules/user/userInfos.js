@@ -1,6 +1,9 @@
 import { db_adm_conn } from "../db/index.js";
 import { json } from "express";
 import { checkInputBeforeSqlQuery } from '../Helper.js';
+import path from 'path';
+const __dirname = path.resolve();
+
 export const down = async (req, res) => {
     res.download(__dirname + '/userIndos.js', (error) => {
         if (error) {
