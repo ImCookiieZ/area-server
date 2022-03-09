@@ -15,12 +15,9 @@ export const checkUserExists = async (user) => {
 export const secureRouteMiddleware = (req, res, next) => {
     const token = req.cookies.YEPAreaToken;
     let header_token = req.headers['authorization']
-    console.log("secret: ", process.env.JWT_SECRET)
     if (typeof token != "undefined" && token != null) {
         try {
-            console.log("cookie token: ", token)
             const user = jwt.verify(token, process.env.JWT_SECRET);
-            console.log('verified')
             req.user = user;
             if (!checkUserExists(user))
                 throw "user does not exist"
@@ -35,12 +32,9 @@ export const secureRouteMiddleware = (req, res, next) => {
                 if (header_token.indexOf("Bearer ") != 0)
                     throw "no valid bearer"
                 header_token = header_token.substring(7)
-                console.log("header token: ", header_token)
             const user = jwt.verify(header_token, process.env.JWT_SECRET);
-            console.log('verified')
             
                 req.user = user;
-                console.log(user)
                 if (!checkUserExists(user)){
                     console.log("user not existing")
                     res.status(401).send(createErrorMessage("401 Unauthorized User does not exist"));
