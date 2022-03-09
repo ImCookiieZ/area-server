@@ -5,7 +5,7 @@ import { getClient } from './client.js'
 export const createSongToPlaylist = async (req, res) => {
     try {
     // const songlink = req.body.songlink
-        var playlist_link = req.body.song_link
+        var playlist_link = req.body.playlist_link
         var prefix = "https://open.spotify.com/playlist/"
         var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
         console.log(playlistid)
