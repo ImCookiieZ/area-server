@@ -42,7 +42,7 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
                 console.log("datestring:", dateString)
                 const secs = dateString.getTime() / 1000
                 console.log("secs:", secs)
-                console.log("now: ",  Math.floor((new Date().getTime() - 2) / 1000)
+                console.log("now: ",  Math.floor((new Date().getTime() - 2) / 1000))
                 const name = commit["author"]["name"]
                 const email = commit["author"]["email"]
                 const msg = commit["message"]
