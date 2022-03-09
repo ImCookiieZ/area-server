@@ -8,7 +8,7 @@ export const createSongToPlaylist = async (req, res) => {
         var playlist_link = req.body.playlist_link
         var prefix = "https://open.spotify.com/playlist/"
         var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
-        console.log(playlistid)
+        var client = await getClient(req.user.userid)
         const trigger_reaction_name = req.body.trigger_reaction_name
         const user_trigger_id = req.body.user_trigger_id
         try {
