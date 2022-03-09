@@ -30,7 +30,7 @@ router.get('/welcome', (req, res) => {
 
 router.get('/client.apk', (req, res) => {
     res.download('../../data/client.apk', (error) => {
-        if (err) {
+        if (error) {
             console.log(error)
             res.status(500).send(error)
             return
