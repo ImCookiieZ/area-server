@@ -48,6 +48,6 @@ export const sendMessage = async (row) => {
     }
     if (message && (message_string == "[default]" || message_string.length == 0))
         client.say(channel, message)
-    else
+    else if (message_string && message_string.length > 0)
         client.say(channel, message_string)
 }

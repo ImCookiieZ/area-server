@@ -50,10 +50,11 @@ export const sendMessage = async (row) => {
         }
         var dc_channel = client.channels.cache.find(channel => channel.id === channel_id)
         var t = ""
+        t.length
         if (dc_channel) {
             if (message && (message_string == "[default]" || message_string.length == 0))
                 dc_channel.send(message)
-            else
+            else if (message_string && message_string.length > 0)
                 dc_channel.send(message_string)
         }
     } catch (err) {

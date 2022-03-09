@@ -94,7 +94,7 @@ client.on('message', async (channel, tags, message, self) => {
         var items = []
         for (var row of commands_res.rows) {
             console.log(row)
-            items.push({id: row.id, type: row.type, commandname: row.commandname, argument: message.substring(message.indexOf(' ') + 1)})
+            items.push({id: row.id, type: row.type, commandname: row.commandname, argument: message.substring(message.indexOf(' ') + 1), message: "user send: " + message})
         }
         if (handleReactions(items))
             client.say(channel, "command executed <3")
