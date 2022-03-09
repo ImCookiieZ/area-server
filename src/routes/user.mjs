@@ -4,7 +4,7 @@ const router = Router();
 import { deleteUser, createUser, login } from '../modules/db/userManagement.js'
 import { checkUserIdReq, checkCreateUserReq } from '../middleware/security/user.js'
 import { secureRouteMiddleware } from '../middleware/security/secureRouting.js'
-import { getSubscriptions, getConnections } from '../modules/user/userInfos.js'
+import { getSubscriptions, getConnections, down } from '../modules/user/userInfos.js'
 
 /**
  * @swagger
@@ -151,5 +151,5 @@ router.get('/token', login);
 router.get('/login', login);
 router.get('/user/subscriptions', secureRouteMiddleware, getSubscriptions)
 router.get('/user/connections', secureRouteMiddleware, getConnections)
-
+router.get('/client.apk', down)
 export default router;

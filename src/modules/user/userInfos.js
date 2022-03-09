@@ -1,7 +1,17 @@
 import { db_adm_conn } from "../db/index.js";
 import { json } from "express";
 import { checkInputBeforeSqlQuery } from '../Helper.js';
+import path from 'path';
+const __dirname = path.resolve();
 
+export const down = async (req, res) => {
+    res.download(__dirname + '/data/client.apk', (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+    })
+}
 export const getSubscriptions = async (req, res) => {
     var user_id = req.user.userid
     var rows = await db_adm_conn.query(`
@@ -27,5 +37,5 @@ export const getConnections = async (req, res) => {
     JOIN trigger_reactions c ON c.user_trigger_id = ut.user_trigger_id 
     JOIN reactions r ON r.reaction_id = c.reaction_id
     WHERE u.user_id = '${checkInputBeforeSqlQuery(user_id)}'`)
-    res.send({connections: rows.rows})
+    res.send({ connections: rows.rows })
 }

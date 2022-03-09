@@ -1,17 +1,20 @@
 import db_adm_conn from '../../db/index.js'
 import { getReactionId } from '../../db/reaction.js'
-import { checkInputBeforeSqlQuery } from "../../Helper.js"
+import { checkInputBeforeSqlQuery, createErrorMessage } from "../../Helper.js"
 import { getClient } from './client.js'
-
 export const createSongToPlaylist = async (req, res) => {
     try {
     // const songlink = req.body.songlink
-        const playlistid = req.body.playlistid
+        var playlist_link = req.body.playlist_link
+        var prefix = "https://open.spotify.com/playlist/"
+        var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
+        var client = await getClient(req.user.userid)
         const trigger_reaction_name = req.body.trigger_reaction_name
         const user_trigger_id = req.body.user_trigger_id
         try {
             await client.getPlaylist(playlistid)
         } catch(err) {
+            console.log(err)
             res.status(400).send(createErrorMessage('playlist id does not exist'))
             return
         }
