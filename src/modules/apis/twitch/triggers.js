@@ -19,7 +19,7 @@ export const createChannelLive = async (req, res) => {
     await db_adm_conn.query(`
     INSERT INTO trigger_arguments(user_trigger_id, argument_name, argument_value)
     VALUES
-    ('${user_trigger_id_res.rows[0].user_trigger_id}', 'channel_name', '${channel_name}'),
+    ('${user_trigger_id_res.rows[0].user_trigger_id}', 'channel_name', '#${channel_name}'),
     ('${user_trigger_id_res.rows[0].user_trigger_id}', 'live_state', 'offline')`)
     res.status(202).send({ user_trigger_id: user_trigger_id_res.rows[0].user_trigger_id })
 }
@@ -44,7 +44,7 @@ export const createChannelCommand = async (req, res) => {
         await db_adm_conn.query(`
         INSERT INTO trigger_arguments(user_trigger_id, argument_name, argument_value)
         VALUES
-            ('${user_trigger_id_res.rows[0].user_trigger_id}', 'channel_name', '${channel_name}'), 
+            ('${user_trigger_id_res.rows[0].user_trigger_id}', 'channel_name', '#${channel_name}'), 
             ('${user_trigger_id_res.rows[0].user_trigger_id}', 'command_name', '${commandname}')`)
         await reloadTwitchClient()
         res.status(202).send({ user_trigger_id: user_trigger_id_res.rows[0].user_trigger_id })

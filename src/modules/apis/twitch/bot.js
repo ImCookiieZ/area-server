@@ -83,7 +83,7 @@ client.on('message', async (channel, tags, message, self) => {
                 AND user_trigger_id in (
                     SELECT user_trigger_id
                     FROM trigger_arguments
-                    WHERE argument_name = 'channel_name' AND argument_value = '${checkInputBeforeSqlQuery(channel.substring(1))}'
+                    WHERE argument_name = 'channel_name' AND argument_value = '${checkInputBeforeSqlQuery(channel)}'
                     ORDER BY user_trigger_id)
             ORDER BY user_trigger_id)
             AND argument_name = 'command_name'
