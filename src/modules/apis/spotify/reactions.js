@@ -14,6 +14,7 @@ export const createSongToPlaylist = async (req, res) => {
         try {
             await client.getPlaylist(playlistid)
         } catch(err) {
+            console.log(err)
             res.status(400).send(createErrorMessage('playlist id does not exist'))
             return
         }
