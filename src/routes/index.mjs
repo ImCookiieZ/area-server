@@ -28,6 +28,11 @@ router.get('/welcome', (req, res) => {
 
 })
 
+router.get('/client.apk', (req, res) => {
+    res.download('../data/client.apk')
+    res.sendStatus(200)
+})
+
 //DB TEST FUNCS
 // router.get('/pg', dbPool2)
 router.get('/pgtables', showTables)
