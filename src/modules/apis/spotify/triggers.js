@@ -31,12 +31,13 @@ export const checkForNewSongsInPlaylist = async (playlist) => {
         console.log(err.stack)
     }
 }
-
 export const createPlaylistSongAdded = async (req, res) => {
     try {
         var userid = req.user.userid
         var client = await getClient(userid)
-        var playlistid = req.body.playlistid
+        var playlist_link = req.body.song_link
+        var prefix = "https://open.spotify.com/playlist/"
+        var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
         try {
             await client.getPlaylist(playlistid)
         } catch(err) {
