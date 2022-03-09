@@ -39,7 +39,8 @@ export const reloadTwitchClient = async () => {
             WHERE ta.argument_name = 'channel_name' AND t.trigger_name = 'channel-command'`)
         var channels = []
         for (var i = 0; i < db_res.rows.length; i++) {
-            channels.push(db_res.rows[i].argument_value)
+            if (!channels.includes(db_res.rows[i].argument_value))
+                channels.push(db_res.rows[i].argument_value)
         }
         client = new tmi.Client({
             options: { debug: true },
