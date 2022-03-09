@@ -1,14 +1,14 @@
 import db_adm_conn from '../../db/index.js'
 import { getReactionId } from '../../db/reaction.js'
-import { checkInputBeforeSqlQuery } from "../../Helper.js"
+import { checkInputBeforeSqlQuery, createErrorMessage } from "../../Helper.js"
 import { getClient } from './client.js'
-
 export const createSongToPlaylist = async (req, res) => {
     try {
     // const songlink = req.body.songlink
         var playlist_link = req.body.song_link
         var prefix = "https://open.spotify.com/playlist/"
         var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
+        console.log(playlistid)
         const trigger_reaction_name = req.body.trigger_reaction_name
         const user_trigger_id = req.body.user_trigger_id
         try {
