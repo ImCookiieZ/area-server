@@ -31,7 +31,7 @@ export const login = async (req, res) => {
     res.send('https://www.reddit.com/api/v1/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: 'k5ndHm7BU7tnwYMQYp1gCg',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/reddit/callback',
             state: state,
@@ -54,7 +54,7 @@ export const loginApp = async (req, res) => {
     res.redirect('https://www.reddit.com/api/v1/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: 'k5ndHm7BU7tnwYMQYp1gCg',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/reddit/callback',
             state: state,

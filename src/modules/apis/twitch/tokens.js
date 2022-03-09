@@ -31,7 +31,7 @@ export const login = async (req, res) => {
     res.send('https://id.twitch.tv/oauth2/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '30o6vog6b7nigqnnxyo6iajz70cvnu',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/twitch/callback',
             state: state
@@ -52,7 +52,7 @@ export const loginApp = async (req, res) => {
     res.redirect('https://id.twitch.tv/oauth2/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '30o6vog6b7nigqnnxyo6iajz70cvnu',
+            client_id: client_id,
             scope: scope,
             redirect_uri: 'https://karl-area-server.herokuapp.com/twitch/callback',
             state: state
@@ -74,16 +74,13 @@ export const store_tokens = async (req, res) => {
                     code: code,
                     redirect_uri: redirect_uri,
                     grant_type: 'authorization_code',
-                    client_id:  (await db_adm_conn.query(`SELECT client_id FROM services WHERE service_name = 'twitch'`)).rows[0].client_id,
+                    client_id:  client_id,
                     client_secret: client_secret
                 },
                 headers: {
                 },
                 json: true
             };
-            console.log(authOptions)
-            console.log(client_id)
-            console.log(client_secret)
             request.post(authOptions, async (error, response, body) => {
                 if (!error && response.statusCode === 200) {
                     var access_token = body.access_token,

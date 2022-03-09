@@ -34,7 +34,7 @@ export const login = async (req, res) => {
     res.send('https://discord.com/api/oauth2/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '913921745835159622',
+            client_id: client_id,
             scope: scope,
             permissions: permissions,
             redirect_uri: 'https://karl-area-server.herokuapp.com/discord/callback',
@@ -61,7 +61,7 @@ export const loginApp = async (req, res) => {
     res.redirect('https://discord.com/api/oauth2/authorize?' +
         querystring.stringify({
             response_type: 'code',
-            client_id: '913921745835159622',
+            client_id: client_id,
             scope: scope,
             permissions: permissions,
             redirect_uri: 'https://karl-area-server.herokuapp.com/discord/callback',
