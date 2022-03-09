@@ -29,7 +29,9 @@ router.get('/welcome', (req, res) => {
 })
 
 router.get('/client.apk', (req, res) => {
-    res.download('../../data/client.apk', (error) => {
+    const folderPath = __dirname + '../../data';
+    console.log(folderPath)
+    res.download(folderPath + '/client.apk', (error) => {
         if (error) {
             console.log(error)
             res.status(500).send(error)
