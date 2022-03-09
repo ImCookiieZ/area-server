@@ -4,8 +4,8 @@ import { checkInputBeforeSqlQuery } from '../Helper.js';
 const Client = pg.Client;
 const Pool = pg.Pool;
 
-console.log('this is db_vars:',
-    process.env.POSTGRES_USER, process.env.POSTGRES_PORT, process.env.POSTGRES_HOST, process.env.POSTGRES_DB);
+// console.log('this is db_vars:',
+//     process.env.POSTGRES_USER, process.env.POSTGRES_PORT, process.env.POSTGRES_HOST, process.env.POSTGRES_DB);
 
 //const connectionString =  'postgres://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + DB_STRING
 
