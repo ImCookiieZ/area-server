@@ -39,16 +39,16 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
                 const commit = commits[i]["commit"]
                 const tm = commit["author"]["date"]
                 const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
-                console.log("datestring:", dateString)
+
                 const secs = dateString.getTime() / 1000
-                console.log("secs:", secs)
-                console.log("now: ",  Math.floor((new Date().getTime() - 2) / 1000))
+
+
                 const name = commit["author"]["name"]
                 const email = commit["author"]["email"]
                 const msg = commit["message"]
 
                 //console.log("msg:", msg, "at", tm, "\nsecs:", secs, "\nlast:", info.lastchecked, "\ndiff:", secs - info.lastchecked, "\n\n")
-                if (secs + 3600 > info.lastchecked) {
+                if (secs > info.lastchecked) {
                     ret.push({
                         id: commands_res.rows[0].id,
                         type: commands_res.rows[0].type,
@@ -206,7 +206,7 @@ const checkEachGithubPR = async (info, user_trigger_id) => {
 
                 const username = cur["user"]["login"]
 
-                if (secs + 3600 > info.lastchecked) {
+                if (secs > info.lastchecked) {
                     ret.push({
                         id: commands_res.rows[0].id,
                         type: commands_res.rows[0].type,
