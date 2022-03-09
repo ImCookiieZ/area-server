@@ -61,17 +61,14 @@ export const upvoteRedditPost = async(row) => {
     }
     console.log("AFTER: " + postid);
     if (!client) {
-        res.send(404).send(createErrorMessage("Could not get Reddit client"));
+        console.log("Could not get Reddit client");
     }
 
     try {
         client.getSubmission(postid).upvote();
     } catch (err) {
-        res.status(500).send(createErrorMessage(err.stack))
+        console.log(err.stack);
     }
 
-
     console.log(`Upvoted post [${postid}].`);
-
-    res.sendStatus(201);
 }
