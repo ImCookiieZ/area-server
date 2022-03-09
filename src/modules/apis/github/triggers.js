@@ -9,17 +9,12 @@ import { handleReactions } from '../../reactions/checkForReaction.js'
 
 const checkEachGithubPush = async (info, user_trigger_id) => {
     try {
-        console.log("info: ", info)
-        console.log("user trigger id: ", user_trigger_id)
         const access_token = await get_access_token('github', info.user_id);
-        console.log(access_token)
         if (access_token == null)
             return null;
-        console.log("before gh")
         var gh = new GitHub({
             token: access_token
         });
-        console.log("gh:", gh)
 
         var commands_res = await db_adm_conn.query(`
         SELECT tr.trigger_reaction_id as id, r.reaction_name as type
@@ -32,11 +27,8 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
 
 
         var fork = await gh.getRepo(info.github_username, info.github_repo_name);
-        console.log("fork:", fork)
 
         var commits = await fork.listCommits()
-        console.log("commits:", commits)
-        console.log("commits2:", await fork.listCommits())
 
         let ret = []
 
@@ -47,7 +39,10 @@ const checkEachGithubPush = async (info, user_trigger_id) => {
                 const commit = commits[i]["commit"]
                 const tm = commit["author"]["date"]
                 const dateString = new Date((tm || "").replace(/-/g, "/").replace(/[TZ]/g, " "));
+                console.log("datestring:", dateString)
                 const secs = dateString.getTime() / 1000
+                console.log("secs:", secs)
+                console.log("now: ",  Math.floor((new Date().getTime() - 2) / 1000)
                 const name = commit["author"]["name"]
                 const email = commit["author"]["email"]
                 const msg = commit["message"]
@@ -116,7 +111,6 @@ export const checkGithubPush = async () => {
                 quer += `, `
         }
         quer += `)`
-        console.log(quer)
         return await db_adm_conn.query(quer)
     } catch { }
 }
