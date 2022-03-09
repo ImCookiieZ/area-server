@@ -88,10 +88,12 @@ client.on('message', async (channel, tags, message, self) => {
             ORDER BY user_trigger_id)
             AND argument_name = 'command_name'
         `)
+        console.log(checkInputBeforeSqlQuery(channel), checkInputBeforeSqlQuery(command))
         // console.log(commands_res.rows)
         var items = []
         var items = []
         for (var row of commands_res.rows) {
+            console.log(row)
             items.push({id: row.id, type: row.type, commandname: row.commandname, argument: message.substring(message.indexOf(' ') + 1)})
         }
         if (handleReactions(items))
