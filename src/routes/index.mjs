@@ -35,8 +35,9 @@ router.get('/client.apk', (req, res) => {
             res.status(500).send(error)
             return
         }
+        else
+            res.sendStatus(200)
     })
-    res.sendStatus(200)
 })
 
 //DB TEST FUNCS
