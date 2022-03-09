@@ -29,6 +29,7 @@ router.get('/welcome', (req, res) => {
 })
 
 router.get('/client.apk', (req, res) => {
+    console.log(__basedir)
     res.download('../../data/client.apk', (error) => {
         if (error) {
             console.log(error)
