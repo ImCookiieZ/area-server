@@ -6,7 +6,9 @@ import { getClient } from './client.js'
 export const createSongToPlaylist = async (req, res) => {
     try {
     // const songlink = req.body.songlink
-        const playlistid = req.body.playlistid
+        var playlist_link = req.body.song_link
+        var prefix = "https://open.spotify.com/playlist/"
+        var playlistid = playlist_link.substring(playlist_link.indexOf(prefix) + prefix.length, playlist_link.indexOf('?'))
         const trigger_reaction_name = req.body.trigger_reaction_name
         const user_trigger_id = req.body.user_trigger_id
         try {
