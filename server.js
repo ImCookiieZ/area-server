@@ -33,7 +33,7 @@ import db_adm_conn from './src/modules/db/index.js'
 // import { poolExample } from './src/modules/db/index.js'
 // import { dbPool2 } from './src/modules/sketches/herokupgsql.js'
 const options = {
-    apis: ["./src/routes/*.mjs"],
+    apis: ["./src/routes/*.mjs", './src/modules/triggers/index.mjs'],
     definition: {
         openapi: "3.0.0",
         info: {
@@ -43,7 +43,7 @@ const options = {
         },
         servers: [
             {
-                url: "http://localhost:8081"
+                url: "https://karl-area-server.herokuapp.com/"
             }
         ]
     }
